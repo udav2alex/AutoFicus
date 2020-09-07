@@ -16,7 +16,7 @@ import ru.gressor.autoficus.ui.common.getColorResource
 import java.text.SimpleDateFormat
 import java.util.*
 
-class NoteActivity: AppCompatActivity() {
+class NoteActivity : AppCompatActivity() {
 
     private var note: Note? = null
     private lateinit var viewModel: NoteViewModel
@@ -25,6 +25,7 @@ class NoteActivity: AppCompatActivity() {
         override fun afterTextChanged(s: Editable?) {
             saveNote()
         }
+
         override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
         override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
     }
@@ -32,7 +33,7 @@ class NoteActivity: AppCompatActivity() {
     companion object {
         private val EXTRA_NOTE = NoteActivity::class.java.name + "extra.NOTE"
 
-        fun start(context: Context, note: Note?) =
+        fun start(context: Context, note: Note? = null) =
             Intent(context, NoteActivity::class.java).run {
                 note?.let {
                     putExtra(EXTRA_NOTE, note)
@@ -59,14 +60,18 @@ class NoteActivity: AppCompatActivity() {
             title = note_title.text.toString(),
             text = note_text.text.toString(),
             lastChanged = Date()
-        ) ?: Note(UUID.randomUUID().toString(), note_title.text.toString(), note_text.text.toString())
+        ) ?: Note(
+            UUID.randomUUID().toString(),
+            note_title.text.toString(),
+            note_text.text.toString()
+        )
 
         note?.let {
             viewModel.save(it)
         }
     }
 
-    override fun onOptionsItemSelected(item: MenuItem) = when(item.itemId) {
+    override fun onOptionsItemSelected(item: MenuItem) = when (item.itemId) {
         android.R.id.home -> {
             onBackPressed()
             true
@@ -78,7 +83,7 @@ class NoteActivity: AppCompatActivity() {
         note_title.removeTextChangedListener(textChangeListener)
         note_text.removeTextChangedListener(textChangeListener)
 
-        note?.let{
+        note?.let {
             note_title.setText(it.title)
             note_text.setText(it.text)
             toolbar.setBackgroundColor(this@NoteActivity.getColor(getColorResource(note!!.color)))

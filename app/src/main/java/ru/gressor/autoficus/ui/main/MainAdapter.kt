@@ -10,7 +10,7 @@ import ru.gressor.autoficus.R
 import ru.gressor.autoficus.data.entity.Note
 import ru.gressor.autoficus.ui.common.getColorResource
 
-class MainAdapter(private val onItemClickListener: OnItemClickListener):
+class MainAdapter(private val onItemClick: ((Note) -> Unit)?):
     RecyclerView.Adapter<MainAdapter.ViewHolder>() {
 
     @FunctionalInterface
@@ -43,7 +43,7 @@ class MainAdapter(private val onItemClickListener: OnItemClickListener):
             note_text.text = note.text
             note_title.isChecked = note.checked
             setBackgroundColor(ContextCompat.getColor(itemView.context, getColorResource(note.color)))
-            itemView.setOnClickListener { onItemClickListener.onItemClick(note) }
+            itemView.setOnClickListener { onItemClick?.invoke(note) }
         }
     }
 }
