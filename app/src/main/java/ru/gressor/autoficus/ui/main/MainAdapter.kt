@@ -1,14 +1,22 @@
-package ru.gressor.autoficus.ui
+package ru.gressor.autoficus.ui.main
 
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.RecyclerView
-import kotlinx.android.synthetic.main.note_item.view.*
+import kotlinx.android.synthetic.main.item_note.view.*
 import ru.gressor.autoficus.R
 import ru.gressor.autoficus.data.entity.Note
+import ru.gressor.autoficus.ui.common.getColorResource
 
-class NotesRVAdapter : RecyclerView.Adapter<NotesRVAdapter.ViewHolder>() {
+class MainAdapter(private val onItemClickListener: OnItemClickListener):
+    RecyclerView.Adapter<MainAdapter.ViewHolder>() {
+
+    @FunctionalInterface
+    interface OnItemClickListener {
+        fun onItemClick(note: Note)
+    }
 
     var notes: List<Note> = listOf()
         set(value) {
@@ -19,7 +27,7 @@ class NotesRVAdapter : RecyclerView.Adapter<NotesRVAdapter.ViewHolder>() {
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int) =
         ViewHolder(
             LayoutInflater.from(parent.context).inflate(
-                R.layout.note_item,
+                R.layout.item_note,
                 parent,
                 false
             )
@@ -29,12 +37,13 @@ class NotesRVAdapter : RecyclerView.Adapter<NotesRVAdapter.ViewHolder>() {
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) = holder.bind(notes[position])
 
-    class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
+    inner class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         fun bind(note: Note) = with(itemView) {
             note_title.text = note.title
             note_text.text = note.text
             note_title.isChecked = note.checked
-            setBackgroundColor(note.color)
+            setBackgroundColor(ContextCompat.getColor(itemView.context, getColorResource(note.color)))
+            itemView.setOnClickListener { onItemClickListener.onItemClick(note) }
         }
     }
 }
