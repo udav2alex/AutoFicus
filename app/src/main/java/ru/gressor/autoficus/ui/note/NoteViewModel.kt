@@ -1,14 +1,28 @@
 package ru.gressor.autoficus.ui.note
 
-import androidx.lifecycle.ViewModel
 import ru.gressor.autoficus.data.NotesRepository
 import ru.gressor.autoficus.data.entity.Note
+import ru.gressor.autoficus.data.model.RequestResult.*
+import ru.gressor.autoficus.ui.base.BaseViewModel
 
-class NoteViewModel: ViewModel() {
+class NoteViewModel : BaseViewModel<Note?, NoteViewState>() {
 
     private var pendingNote: Note? = null
 
-    fun save(note: Note) {
+    fun loadNote(noteId: String) {
+        NotesRepository.getNoteById(noteId).observeForever {
+            it?.let { result ->
+                when (result) {
+                    is Success<*> ->
+                        viewStateLiveData.value = NoteViewState(note = result.data as? Note)
+                    is Error ->
+                        viewStateLiveData.value = NoteViewState(error = result.error)
+                }
+            }
+        }
+    }
+
+    fun saveChanges(note: Note) {
         pendingNote = note
     }
 

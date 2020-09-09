@@ -1,21 +1,35 @@
 package ru.gressor.autoficus.ui.main
 
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.ViewModel
+import androidx.lifecycle.Observer
 import ru.gressor.autoficus.data.NotesRepository
+import ru.gressor.autoficus.data.entity.Note
+import ru.gressor.autoficus.data.model.RequestResult
+import ru.gressor.autoficus.data.model.RequestResult.*
+import ru.gressor.autoficus.ui.base.BaseViewModel
 
-class MainViewModel : ViewModel() {
-    private val viewStateLiveData = MutableLiveData<MainViewState>()
+class MainViewModel : BaseViewModel<List<Note>?, MainViewState>() {
 
-    init {
-        NotesRepository.getNotes().observeForever { notes ->
-            notes?.let { it ->
-                viewStateLiveData.value =
-                    viewStateLiveData.value?.copy(notes = it) ?: MainViewState(it)
+    private val notesObserver = Observer<RequestResult> { result ->
+        result?.let {
+            @Suppress("UNCHECKED_CAST")
+            when (result) {
+                is Success<*> ->
+                    viewStateLiveData.value = MainViewState(notes = result.data as? List<Note>)
+                is Error ->
+                    viewStateLiveData.value = MainViewState(error = result.error)
             }
         }
     }
 
-    fun viewState(): LiveData<MainViewState> = viewStateLiveData
+    private val repositoryNotes = NotesRepository.getNotes()
+
+    init {
+        viewStateLiveData.value = MainViewState()
+        repositoryNotes.observeForever(notesObserver)
+    }
+
+    override fun onCleared() {
+        repositoryNotes.removeObserver(notesObserver)
+        super.onCleared()
+    }
 }
