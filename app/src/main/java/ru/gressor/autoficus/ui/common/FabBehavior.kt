@@ -1,6 +1,5 @@
 package ru.gressor.autoficus.ui.common
 
-import android.annotation.SuppressLint
 import android.content.Context
 import android.util.AttributeSet
 import android.view.View
@@ -47,7 +46,6 @@ class FabBehavior(context: Context, attributeSet: AttributeSet) :
         if (dyConsumed > 0 && child.visibility == View.VISIBLE) {
             child.hide(object : FloatingActionButton.OnVisibilityChangedListener() {
 
-                @SuppressLint("RestrictedApi")
                 override fun onHidden(fab: FloatingActionButton) {
                     fab.visibility = View.INVISIBLE
                 }

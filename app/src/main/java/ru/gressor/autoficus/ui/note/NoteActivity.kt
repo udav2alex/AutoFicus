@@ -6,20 +6,25 @@ import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
 import android.view.MenuItem
-import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.ViewModelProvider
 import kotlinx.android.synthetic.main.activity_note.*
 import ru.gressor.autoficus.R
 import ru.gressor.autoficus.data.entity.Note
+import ru.gressor.autoficus.ui.base.BaseActivity
 import ru.gressor.autoficus.ui.common.DATE_TIME_FORMAT
 import ru.gressor.autoficus.ui.common.getColorResource
 import java.text.SimpleDateFormat
 import java.util.*
 
-class NoteActivity : AppCompatActivity() {
+class NoteActivity : BaseActivity<Note?, NoteViewState>() {
+
+    override val layoutRes = R.layout.activity_note
+
+    override val viewModel: NoteViewModel by lazy {
+        ViewModelProvider(this).get(NoteViewModel::class.java)
+    }
 
     private var note: Note? = null
-    private lateinit var viewModel: NoteViewModel
 
     val textChangeListener = object : TextWatcher {
         override fun afterTextChanged(s: Editable?) {
@@ -33,10 +38,10 @@ class NoteActivity : AppCompatActivity() {
     companion object {
         private val EXTRA_NOTE = NoteActivity::class.java.name + "extra.NOTE"
 
-        fun start(context: Context, note: Note? = null) =
+        fun start(context: Context, noteId: String? = null) =
             Intent(context, NoteActivity::class.java).run {
-                note?.let {
-                    putExtra(EXTRA_NOTE, note)
+                noteId?.let {
+                    putExtra(EXTRA_NOTE, noteId)
                 }
                 context.startActivity(this)
             }
@@ -44,12 +49,14 @@ class NoteActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_note)
+        setSupportActionBar(toolbar)
+        supportActionBar?.setDisplayHomeAsUpEnabled(true)
 
-        viewModel = ViewModelProvider(this).get(NoteViewModel::class.java)
-        note = intent.getParcelableExtra(EXTRA_NOTE)
+        val noteId = intent.getStringExtra(EXTRA_NOTE)
+        noteId?.let {
+            viewModel.loadNote(it)
+        }
 
-        initActionBar()
         initView()
     }
 
@@ -67,7 +74,7 @@ class NoteActivity : AppCompatActivity() {
         )
 
         note?.let {
-            viewModel.save(it)
+            viewModel.saveChanges(it)
         }
     }
 
@@ -84,23 +91,21 @@ class NoteActivity : AppCompatActivity() {
         note_text.removeTextChangedListener(textChangeListener)
 
         note?.let {
+            supportActionBar?.title =
+                SimpleDateFormat(DATE_TIME_FORMAT, Locale.getDefault()).format(note!!.lastChanged)
             note_title.setText(it.title)
             note_text.setText(it.text)
-            toolbar.setBackgroundColor(this@NoteActivity.getColor(getColorResource(note!!.color)))
+            toolbar.setBackgroundColor(this@NoteActivity.getColor(getColorResource(it.color)))
+        } ?: run {
+            supportActionBar?.title = getString(R.string.new_note_title)
         }
 
         note_title.addTextChangedListener(textChangeListener)
         note_text.addTextChangedListener(textChangeListener)
     }
 
-    private fun initActionBar() {
-        setSupportActionBar(toolbar)
-        supportActionBar?.setDisplayHomeAsUpEnabled(true)
-        supportActionBar?.title = if (note == null) {
-            getString(R.string.new_note_title)
-        } else {
-            SimpleDateFormat(DATE_TIME_FORMAT, Locale.getDefault())
-                .format(note!!.lastChanged)
-        }
+    override fun renderData(data: Note?) {
+        this.note = data
+        initView()
     }
 }

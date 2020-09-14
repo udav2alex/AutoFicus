@@ -13,8 +13,7 @@ import ru.gressor.autoficus.ui.common.getColorResource
 class MainAdapter(private val onItemClick: ((Note) -> Unit)?):
     RecyclerView.Adapter<MainAdapter.ViewHolder>() {
 
-    @FunctionalInterface
-    interface OnItemClickListener {
+    fun interface OnItemClickListener {
         fun onItemClick(note: Note)
     }
 

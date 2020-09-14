@@ -4,4 +4,5 @@
     <string name="note_text">Note text</string>
     <string name="note_title">Note title</string>
     <string name="new_note_title">New note</string>
+    <string name="ok_bth_title">Close</string>
 </resources>
