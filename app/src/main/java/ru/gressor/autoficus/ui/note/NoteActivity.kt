@@ -12,7 +12,8 @@ import ru.gressor.autoficus.R
 import ru.gressor.autoficus.data.entity.Note
 import ru.gressor.autoficus.ui.base.BaseActivity
 import ru.gressor.autoficus.ui.common.DATE_TIME_FORMAT
-import ru.gressor.autoficus.ui.common.getColorResource
+import ru.gressor.autoficus.ui.common.format
+import ru.gressor.autoficus.ui.common.getColorInt
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -26,11 +27,8 @@ class NoteActivity : BaseActivity<Note?, NoteViewState>() {
 
     private var note: Note? = null
 
-    val textChangeListener = object : TextWatcher {
-        override fun afterTextChanged(s: Editable?) {
-            saveNote()
-        }
-
+    private val textChangeListener = object : TextWatcher {
+        override fun afterTextChanged(s: Editable?) { saveNote() }
         override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
         override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
     }
@@ -90,12 +88,11 @@ class NoteActivity : BaseActivity<Note?, NoteViewState>() {
         note_title.removeTextChangedListener(textChangeListener)
         note_text.removeTextChangedListener(textChangeListener)
 
-        note?.let {
-            supportActionBar?.title =
-                SimpleDateFormat(DATE_TIME_FORMAT, Locale.getDefault()).format(note!!.lastChanged)
-            note_title.setText(it.title)
-            note_text.setText(it.text)
-            toolbar.setBackgroundColor(this@NoteActivity.getColor(getColorResource(it.color)))
+        note?.run {
+            supportActionBar?.title = lastChanged.format()
+            note_title.setText(title)
+            note_text.setText(text)
+            toolbar.setBackgroundColor(color.getColorInt(this@NoteActivity))
         } ?: run {
             supportActionBar?.title = getString(R.string.new_note_title)
         }
