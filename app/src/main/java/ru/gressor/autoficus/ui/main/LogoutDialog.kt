@@ -22,6 +22,6 @@ class LogoutDialog: DialogFragment() {
             .setTitle("Logout")
             .setMessage("Are you sure?")
             .setPositiveButton(android.R.string.ok) { _, _ -> onLogout?.invoke() }
-            .setPositiveButton(android.R.string.cancel) { _, _ -> dismiss() }
+            .setNegativeButton(android.R.string.cancel) { _, _ -> dismiss() }
             .create()
 }
