@@ -4,6 +4,7 @@ import android.app.AlertDialog
 import android.app.Dialog
 import android.os.Bundle
 import androidx.fragment.app.DialogFragment
+import ru.gressor.autoficus.R
 
 class LogoutDialog: DialogFragment() {
 
@@ -19,8 +20,8 @@ class LogoutDialog: DialogFragment() {
 
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog =
         AlertDialog.Builder(context)
-            .setTitle("Logout")
-            .setMessage("Are you sure?")
+            .setTitle(getString(R.string.logout))
+            .setMessage(getString(R.string.are_you_sure))
             .setPositiveButton(android.R.string.ok) { _, _ -> onLogout?.invoke() }
             .setNegativeButton(android.R.string.cancel) { _, _ -> dismiss() }
             .create()

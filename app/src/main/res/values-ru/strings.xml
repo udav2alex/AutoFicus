@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="not_available">н/д</string>
+    <string name="note_text">Текст заметки</string>
+    <string name="note_title">Заголовок заметки</string>
+    <string name="new_note_title">Новая заметка</string>
+    <string name="ok_bth_title">Закрыть</string>
+    <string name="logout_menu_title">Выход</string>
+    <string name="logout">Выход</string>
+    <string name="are_you_sure">Вы уверены?</string>
+</resources>
