@@ -3,19 +3,14 @@ package ru.gressor.autoficus.ui.main
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.RecyclerView
 import kotlinx.android.synthetic.main.item_note.view.*
 import ru.gressor.autoficus.R
 import ru.gressor.autoficus.data.entity.Note
-import ru.gressor.autoficus.ui.common.getColorResource
+import ru.gressor.autoficus.ui.common.getColorInt
 
 class MainAdapter(private val onItemClick: ((Note) -> Unit)?):
     RecyclerView.Adapter<MainAdapter.ViewHolder>() {
-
-    fun interface OnItemClickListener {
-        fun onItemClick(note: Note)
-    }
 
     var notes: List<Note> = listOf()
         set(value) {
@@ -41,8 +36,8 @@ class MainAdapter(private val onItemClick: ((Note) -> Unit)?):
             note_title.text = note.title
             note_text.text = note.text
             note_title.isChecked = note.checked
-            setBackgroundColor(ContextCompat.getColor(itemView.context, getColorResource(note.color)))
-            itemView.setOnClickListener { onItemClick?.invoke(note) }
+            setBackgroundColor(note.color.getColorInt(context))
+            setOnClickListener { onItemClick?.invoke(note) }
         }
     }
 }

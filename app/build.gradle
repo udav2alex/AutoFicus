@@ -27,6 +27,13 @@ android {
         sourceCompatibility JavaVersion.VERSION_1_8
         targetCompatibility JavaVersion.VERSION_1_8
     }
+    sourceSets {
+        main {
+            res {
+                srcDirs 'src/main/res', 'src/main/res/main'
+            }
+        }
+    }
 }
 
 dependencies {
@@ -36,6 +43,7 @@ dependencies {
 
     implementation 'com.google.firebase:firebase-core:17.5.0'
     implementation 'com.google.firebase:firebase-firestore:21.6.0'
+    implementation 'com.firebaseui:firebase-ui-auth:6.2.0'
 
     implementation 'androidx.lifecycle:lifecycle-extensions:2.2.0'
 
