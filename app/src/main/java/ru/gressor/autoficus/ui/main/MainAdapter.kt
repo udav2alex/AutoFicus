@@ -4,7 +4,8 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
-import kotlinx.android.synthetic.main.item_note.view.*
+import kotlinx.android.extensions.LayoutContainer
+import kotlinx.android.synthetic.main.item_note.*
 import ru.gressor.autoficus.R
 import ru.gressor.autoficus.data.entity.Note
 import ru.gressor.autoficus.ui.common.getColorInt
@@ -31,13 +32,15 @@ class MainAdapter(private val onItemClick: ((Note) -> Unit)?):
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) = holder.bind(notes[position])
 
-    inner class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
-        fun bind(note: Note) = with(itemView) {
+    inner class ViewHolder(override val containerView: View) :
+        RecyclerView.ViewHolder(containerView), LayoutContainer {
+
+        fun bind(note: Note) {
             note_title.text = note.title
             note_text.text = note.text
             note_title.isChecked = note.checked
-            setBackgroundColor(note.color.getColorInt(context))
-            setOnClickListener { onItemClick?.invoke(note) }
+            containerView.setBackgroundColor(note.color.getColorInt(containerView.context))
+            containerView.setOnClickListener { onItemClick?.invoke(note) }
         }
     }
 }

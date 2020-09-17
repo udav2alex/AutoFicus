@@ -8,4 +8,7 @@
     <string name="logout_menu_title">Logout</string>
     <string name="logout">Logout</string>
     <string name="are_you_sure">Are you sure?</string>
+    <string name="change_color_menu_title">Change color</string>
+    <string name="delete_menu_title">Delete</string>
+    <string name="note_delete_message">Delete note?</string>
 </resources>

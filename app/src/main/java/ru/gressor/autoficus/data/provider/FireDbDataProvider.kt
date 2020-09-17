@@ -10,19 +10,21 @@ import ru.gressor.autoficus.data.errors.NoAuthException
 import ru.gressor.autoficus.data.model.RequestResult
 import ru.gressor.autoficus.data.model.User
 
-class FireDbDataProvider : RemoteDataProvider {
-    private val TAG = "${FireDbDataProvider::class.java.simpleName} :"
+class FireDbDataProvider(
+    private val db: FirebaseFirestore,
+    private val auth: FirebaseAuth) : RemoteDataProvider {
 
     companion object {
         private const val NOTES_COLLECTION = "notes"
         private const val USERS_COLLECTION = "users"
     }
 
-    private val db = FirebaseFirestore.getInstance()
-    private val currentUser
-        get() = FirebaseAuth.getInstance().currentUser
+    private val TAG = "${FireDbDataProvider::class.java.simpleName} :"
 
-    private fun getUserNotesCollection() =
+    private val currentUser
+        get() = auth.currentUser
+
+    private val userNotesCollection =
         currentUser?.let {
             db.collection(USERS_COLLECTION).document(it.uid).collection(NOTES_COLLECTION)
         } ?: throw NoAuthException()
@@ -30,12 +32,13 @@ class FireDbDataProvider : RemoteDataProvider {
     override fun subscribeToAllNotes(): LiveData<RequestResult> =
         MutableLiveData<RequestResult>().apply {
             try {
-                getUserNotesCollection()
+                userNotesCollection
                     .addSnapshotListener { querySnapshot, error ->
                         this.value = error?.let {
                             Log.d(TAG, "Error in subscribeToAllNotes: ${it.message}")
                             throw it
                         } ?: querySnapshot?.let {
+                            Log.d(TAG, "subscribeToAllNotes")
                             val notes = it.documents.map { documentSnapshot ->
                                 documentSnapshot.toObject(Note::class.java)
                             }
@@ -50,7 +53,7 @@ class FireDbDataProvider : RemoteDataProvider {
     override fun getNoteById(id: String): LiveData<RequestResult> =
         MutableLiveData<RequestResult>().apply {
             try {
-                getUserNotesCollection().document(id).get()
+                userNotesCollection.document(id).get()
                     .addOnSuccessListener { snapshot ->
                         val note = snapshot.toObject(Note::class.java) as Note
                         this.value = RequestResult.Success(note)
@@ -64,10 +67,28 @@ class FireDbDataProvider : RemoteDataProvider {
             }
         }
 
+    override fun deleteNote(id: String): LiveData<RequestResult> =
+        MutableLiveData<RequestResult>().apply {
+            try {
+                Log.d(TAG, "deleteNote begin")
+                userNotesCollection.document(id).delete()
+                    .addOnSuccessListener {
+                        Log.d(TAG, "deleteNote")
+                        this.value = RequestResult.Success(null)
+                    }
+                    .addOnFailureListener { error ->
+                        Log.d(TAG, "Error in deleteNote: ${error.message}")
+                        throw error
+                    }
+            } catch (error: Throwable) {
+                this.value = RequestResult.Error(error)
+            }
+        }
+
     override fun saveNote(note: Note): LiveData<RequestResult> =
         MutableLiveData<RequestResult>().apply {
             try {
-                getUserNotesCollection().document(note.id).set(note)
+                userNotesCollection.document(note.id).set(note)
                     .addOnSuccessListener {
                         this.value = RequestResult.Success(note)
                     }

@@ -7,7 +7,8 @@ import ru.gressor.autoficus.data.model.RequestResult
 import ru.gressor.autoficus.data.model.RequestResult.*
 import ru.gressor.autoficus.ui.base.BaseViewModel
 
-class MainViewModel : BaseViewModel<List<Note>?, MainViewState>() {
+class MainViewModel(private val notesRepository: NotesRepository) :
+    BaseViewModel<List<Note>?, MainViewState>() {
 
     private val notesObserver = Observer<RequestResult> { result ->
         result?.let {
@@ -21,7 +22,7 @@ class MainViewModel : BaseViewModel<List<Note>?, MainViewState>() {
         }
     }
 
-    private val repositoryNotes = NotesRepository.getNotes()
+    private val repositoryNotes = notesRepository.getNotes()
 
     init {
         viewStateLiveData.value = MainViewState()

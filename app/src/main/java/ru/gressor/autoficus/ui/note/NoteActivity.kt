@@ -1,46 +1,35 @@
 package ru.gressor.autoficus.ui.note
 
+import android.app.AlertDialog
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
+import android.view.Menu
 import android.view.MenuItem
-import androidx.lifecycle.ViewModelProvider
 import kotlinx.android.synthetic.main.activity_note.*
+import org.koin.android.viewmodel.ext.android.viewModel
 import ru.gressor.autoficus.R
 import ru.gressor.autoficus.data.entity.Note
 import ru.gressor.autoficus.ui.base.BaseActivity
-import ru.gressor.autoficus.ui.common.DATE_TIME_FORMAT
 import ru.gressor.autoficus.ui.common.format
 import ru.gressor.autoficus.ui.common.getColorInt
-import java.text.SimpleDateFormat
 import java.util.*
 
-class NoteActivity : BaseActivity<Note?, NoteViewState>() {
+class NoteActivity : BaseActivity<NoteViewState.Data, NoteViewState>() {
 
     override val layoutRes = R.layout.activity_note
-
-    override val viewModel: NoteViewModel by lazy {
-        ViewModelProvider(this).get(NoteViewModel::class.java)
-    }
+    override val viewModel: NoteViewModel by viewModel()
 
     private var note: Note? = null
-
-    private val textChangeListener = object : TextWatcher {
-        override fun afterTextChanged(s: Editable?) { saveNote() }
-        override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
-        override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
-    }
 
     companion object {
         private val EXTRA_NOTE = NoteActivity::class.java.name + "extra.NOTE"
 
         fun start(context: Context, noteId: String? = null) =
             Intent(context, NoteActivity::class.java).run {
-                noteId?.let {
-                    putExtra(EXTRA_NOTE, noteId)
-                }
+                noteId?.let { putExtra(EXTRA_NOTE, noteId) }
                 context.startActivity(this)
             }
     }
@@ -51,11 +40,15 @@ class NoteActivity : BaseActivity<Note?, NoteViewState>() {
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
 
         val noteId = intent.getStringExtra(EXTRA_NOTE)
-        noteId?.let {
-            viewModel.loadNote(it)
-        }
+        noteId?.let { viewModel.loadNote(it) }
 
         initView()
+    }
+
+    private val textChangeListener = object : TextWatcher {
+        override fun afterTextChanged(s: Editable?) { saveNote() }
+        override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
+        override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
     }
 
     private fun saveNote() {
@@ -76,14 +69,6 @@ class NoteActivity : BaseActivity<Note?, NoteViewState>() {
         }
     }
 
-    override fun onOptionsItemSelected(item: MenuItem) = when (item.itemId) {
-        android.R.id.home -> {
-            onBackPressed()
-            true
-        }
-        else -> super.onOptionsItemSelected(item)
-    }
-
     private fun initView() {
         note_title.removeTextChangedListener(textChangeListener)
         note_text.removeTextChangedListener(textChangeListener)
@@ -92,6 +77,8 @@ class NoteActivity : BaseActivity<Note?, NoteViewState>() {
             supportActionBar?.title = lastChanged.format()
             note_title.setText(title)
             note_text.setText(text)
+            note_title.setSelection(note_title.text?.length ?: 0)
+            note_text.setSelection(note_text.text?.length ?: 0)
             toolbar.setBackgroundColor(color.getColorInt(this@NoteActivity))
         } ?: run {
             supportActionBar?.title = getString(R.string.new_note_title)
@@ -101,8 +88,31 @@ class NoteActivity : BaseActivity<Note?, NoteViewState>() {
         note_text.addTextChangedListener(textChangeListener)
     }
 
-    override fun renderData(data: Note?) {
-        this.note = data
+    override fun renderData(data: NoteViewState.Data) {
+        if(data.isDeleted) finish()
+        this.note = data.note
         initView()
+    }
+
+    override fun onCreateOptionsMenu(menu: Menu?) =
+        menuInflater.inflate(R.menu.note, menu).let { true }
+
+    override fun onOptionsItemSelected(item: MenuItem) = when (item.itemId) {
+        android.R.id.home -> onBackPressed().let { true }
+        R.id.palette -> togglePalette().let { true }
+        R.id.delete -> deleteNote().let { true }
+        else -> super.onOptionsItemSelected(item)
+    }
+
+    private fun togglePalette() {
+
+    }
+
+    private fun deleteNote() {
+        AlertDialog.Builder(this)
+            .setMessage(getString(R.string.note_delete_message))
+            .setPositiveButton(android.R.string.ok) { _, _ -> viewModel.deleteNote() }
+            .setNegativeButton(android.R.string.cancel) { dialog, _ -> dialog.dismiss() }
+            .show()
     }
 }
