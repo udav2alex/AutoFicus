@@ -5,6 +5,7 @@ import ru.gressor.autoficus.data.NotesRepository
 import ru.gressor.autoficus.data.entity.Note
 import ru.gressor.autoficus.data.model.RequestResult.*
 import ru.gressor.autoficus.ui.base.BaseViewModel
+import ru.gressor.autoficus.ui.common.DEBUG_TAG
 
 class NoteViewModel(private val notesRepository: NotesRepository) :
     BaseViewModel<NoteViewState.Data, NoteViewState>() {
@@ -27,9 +28,9 @@ class NoteViewModel(private val notesRepository: NotesRepository) :
 
     fun deleteNote() {
         pendingNote?.let {
-            Log.d("FireDbDataProvider___", "RequestResult???")
+            Log.d(DEBUG_TAG, "RequestResult???")
             notesRepository.deleteNote(it.id).observeForever { requestResult ->
-                Log.d("FireDbDataProvider___", "RequestResult")
+                Log.d(DEBUG_TAG, "RequestResult")
                 requestResult ?: return@observeForever
                 when (requestResult) {
                     is Success<*> -> viewStateLiveData.value =

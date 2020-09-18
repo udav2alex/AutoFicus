@@ -14,7 +14,7 @@ import ru.gressor.autoficus.ui.splash.SplashViewModel
 val appModule = module {
     single { FirebaseAuth.getInstance() }
     single { FirebaseFirestore.getInstance() }
-    single<RemoteDataProvider> { FireDbDataProvider(get(), get()) }
+    single { FireDbDataProvider(get(), get()) } bind RemoteDataProvider::class
     single { NotesRepository(get()) }
 }
 

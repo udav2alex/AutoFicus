@@ -9,10 +9,12 @@ import java.util.*
 
 const val DATE_TIME_FORMAT = "d MMMM yyyy, HH:mm"
 
+const val DEBUG_TAG = "AutoFicusTag :"
+
 fun Date.format(): String = SimpleDateFormat(DATE_TIME_FORMAT, Locale.getDefault())
     .format(this)
 
-fun Color.getColorInt(context: Context) =
+fun Color.getColorRes(context: Context) =
     ContextCompat.getColor(
         context,
         when (this) {
@@ -25,3 +27,6 @@ fun Color.getColorInt(context: Context) =
             Color.BLUE -> R.color.color_blue
         }
     )
+
+fun Color.getColorInt(context: Context) : Int =
+    ContextCompat.getColor(context, this.getColorRes(context))

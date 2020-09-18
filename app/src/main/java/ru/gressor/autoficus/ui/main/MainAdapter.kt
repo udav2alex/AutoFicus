@@ -8,7 +8,7 @@ import kotlinx.android.extensions.LayoutContainer
 import kotlinx.android.synthetic.main.item_note.*
 import ru.gressor.autoficus.R
 import ru.gressor.autoficus.data.entity.Note
-import ru.gressor.autoficus.ui.common.getColorInt
+import ru.gressor.autoficus.ui.common.getColorRes
 
 class MainAdapter(private val onItemClick: ((Note) -> Unit)?):
     RecyclerView.Adapter<MainAdapter.ViewHolder>() {
@@ -39,7 +39,7 @@ class MainAdapter(private val onItemClick: ((Note) -> Unit)?):
             note_title.text = note.title
             note_text.text = note.text
             note_title.isChecked = note.checked
-            containerView.setBackgroundColor(note.color.getColorInt(containerView.context))
+            containerView.setBackgroundColor(note.color.getColorRes(containerView.context))
             containerView.setOnClickListener { onItemClick?.invoke(note) }
         }
     }

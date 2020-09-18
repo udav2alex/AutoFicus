@@ -11,10 +11,11 @@ import android.view.MenuItem
 import kotlinx.android.synthetic.main.activity_note.*
 import org.koin.android.viewmodel.ext.android.viewModel
 import ru.gressor.autoficus.R
+import ru.gressor.autoficus.data.entity.Color
 import ru.gressor.autoficus.data.entity.Note
 import ru.gressor.autoficus.ui.base.BaseActivity
 import ru.gressor.autoficus.ui.common.format
-import ru.gressor.autoficus.ui.common.getColorInt
+import ru.gressor.autoficus.ui.common.getColorRes
 import java.util.*
 
 class NoteActivity : BaseActivity<NoteViewState.Data, NoteViewState>() {
@@ -23,6 +24,7 @@ class NoteActivity : BaseActivity<NoteViewState.Data, NoteViewState>() {
     override val viewModel: NoteViewModel by viewModel()
 
     private var note: Note? = null
+    private var color: Color = Color.BLUE
 
     companion object {
         private val EXTRA_NOTE = NoteActivity::class.java.name + "extra.NOTE"
@@ -57,7 +59,8 @@ class NoteActivity : BaseActivity<NoteViewState.Data, NoteViewState>() {
         note = note?.copy(
             title = note_title.text.toString(),
             text = note_text.text.toString(),
-            lastChanged = Date()
+            lastChanged = Date(),
+            color = color
         ) ?: Note(
             UUID.randomUUID().toString(),
             note_title.text.toString(),
@@ -79,13 +82,19 @@ class NoteActivity : BaseActivity<NoteViewState.Data, NoteViewState>() {
             note_text.setText(text)
             note_title.setSelection(note_title.text?.length ?: 0)
             note_text.setSelection(note_text.text?.length ?: 0)
-            toolbar.setBackgroundColor(color.getColorInt(this@NoteActivity))
+            toolbar.setBackgroundColor(color.getColorRes(this@NoteActivity))
         } ?: run {
             supportActionBar?.title = getString(R.string.new_note_title)
         }
 
         note_title.addTextChangedListener(textChangeListener)
         note_text.addTextChangedListener(textChangeListener)
+
+        colorPicker.onColorClickListener = {
+            color = it
+            toolbar.setBackgroundColor(color.getColorRes(this@NoteActivity))
+            saveNote()
+        }
     }
 
     override fun renderData(data: NoteViewState.Data) {
@@ -105,7 +114,11 @@ class NoteActivity : BaseActivity<NoteViewState.Data, NoteViewState>() {
     }
 
     private fun togglePalette() {
-
+        if (colorPicker.isOpen) {
+            colorPicker.close()
+        } else {
+            colorPicker.open()
+        }
     }
 
     private fun deleteNote() {
@@ -114,5 +127,13 @@ class NoteActivity : BaseActivity<NoteViewState.Data, NoteViewState>() {
             .setPositiveButton(android.R.string.ok) { _, _ -> viewModel.deleteNote() }
             .setNegativeButton(android.R.string.cancel) { dialog, _ -> dialog.dismiss() }
             .show()
+    }
+
+    override fun onBackPressed() {
+        if (colorPicker.isOpen) {
+            colorPicker.close()
+            return
+        }
+        super.onBackPressed()
     }
 }
