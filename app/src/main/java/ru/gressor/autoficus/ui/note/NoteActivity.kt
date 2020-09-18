@@ -15,7 +15,7 @@ import ru.gressor.autoficus.data.entity.Color
 import ru.gressor.autoficus.data.entity.Note
 import ru.gressor.autoficus.ui.base.BaseActivity
 import ru.gressor.autoficus.ui.common.format
-import ru.gressor.autoficus.ui.common.getColorRes
+import ru.gressor.autoficus.ui.common.getColorInt
 import java.util.*
 
 class NoteActivity : BaseActivity<NoteViewState.Data, NoteViewState>() {
@@ -82,7 +82,7 @@ class NoteActivity : BaseActivity<NoteViewState.Data, NoteViewState>() {
             note_text.setText(text)
             note_title.setSelection(note_title.text?.length ?: 0)
             note_text.setSelection(note_text.text?.length ?: 0)
-            toolbar.setBackgroundColor(color.getColorRes(this@NoteActivity))
+            toolbar.setBackgroundColor(color.getColorInt(this@NoteActivity))
         } ?: run {
             supportActionBar?.title = getString(R.string.new_note_title)
         }
@@ -92,7 +92,7 @@ class NoteActivity : BaseActivity<NoteViewState.Data, NoteViewState>() {
 
         colorPicker.onColorClickListener = {
             color = it
-            toolbar.setBackgroundColor(color.getColorRes(this@NoteActivity))
+            toolbar.setBackgroundColor(color.getColorInt(this@NoteActivity))
             saveNote()
         }
     }

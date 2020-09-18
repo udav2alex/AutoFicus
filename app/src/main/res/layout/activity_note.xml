@@ -34,7 +34,6 @@
                 android:layout_height="?attr/actionBarSize"/>
         </HorizontalScrollView>
 
-
     </com.google.android.material.appbar.AppBarLayout>
 
     <LinearLayout

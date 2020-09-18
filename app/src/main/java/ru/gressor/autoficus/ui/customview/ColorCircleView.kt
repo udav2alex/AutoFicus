@@ -68,7 +68,6 @@ class ColorCircleView @JvmOverloads constructor(
         setMeasuredDimension(width, height)
     }
 
-
     override fun onLayout(changed: Boolean, left: Int, top: Int, right: Int, bottom: Int) {
         center = measuredWidth / 2f to measuredHeight / 2f
         super.onLayout(changed, left, top, right, bottom)
