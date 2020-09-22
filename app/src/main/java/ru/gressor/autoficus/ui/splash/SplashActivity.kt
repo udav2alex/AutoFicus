@@ -1,14 +1,12 @@
 package ru.gressor.autoficus.ui.splash
 
-import androidx.lifecycle.ViewModelProvider
+import org.koin.android.viewmodel.ext.android.viewModel
 import ru.gressor.autoficus.ui.base.BaseActivity
 import ru.gressor.autoficus.ui.main.MainActivity
 
 class SplashActivity: BaseActivity<Boolean?, SplashViewState>() {
-    override val viewModel: SplashViewModel by lazy {
-        ViewModelProvider(this).get(SplashViewModel::class.java)
-    }
 
+    override val viewModel: SplashViewModel by viewModel()
     override val layoutRes: Int? = null
 
     override fun onResume() {

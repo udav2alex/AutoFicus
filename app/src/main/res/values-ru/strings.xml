@@ -8,4 +8,7 @@
     <string name="logout_menu_title">Выход</string>
     <string name="logout">Выход</string>
     <string name="are_you_sure">Вы уверены?</string>
+    <string name="change_color_menu_title">Изменить цвет</string>
+    <string name="delete_menu_title">Удалить</string>
+    <string name="note_delete_message">Удалить заметку?</string>
 </resources>

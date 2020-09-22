@@ -9,5 +9,6 @@ interface RemoteDataProvider {
     fun subscribeToAllNotes(): LiveData<RequestResult>
     fun getNoteById(id: String): LiveData<RequestResult>
     fun saveNote(note: Note): LiveData<RequestResult>
+    fun deleteNote(id: String): LiveData<RequestResult>
     fun getCurrentUser(): LiveData<User?>
 }
