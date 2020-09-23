@@ -1,5 +1,7 @@
 package ru.gressor.autoficus.ui.main
 
+
+import androidx.annotation.VisibleForTesting
 import androidx.lifecycle.Observer
 import ru.gressor.autoficus.data.NotesRepository
 import ru.gressor.autoficus.data.entity.Note
@@ -29,7 +31,8 @@ class MainViewModel(private val notesRepository: NotesRepository) :
         repositoryNotes.observeForever(notesObserver)
     }
 
-    override fun onCleared() {
+    @VisibleForTesting
+    public override fun onCleared() {
         repositoryNotes.removeObserver(notesObserver)
         super.onCleared()
     }
