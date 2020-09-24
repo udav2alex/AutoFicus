@@ -1,28 +1,16 @@
 package ru.gressor.autoficus
 
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
+import com.google.android.gms.tasks.OnSuccessListener
 
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.firestore.*
-import io.mockk.clearAllMocks
-import io.mockk.every
-import io.mockk.mockk
-import io.mockk.slot
+
+import io.mockk.*
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
-
-import com.google.android.gms.tasks.OnSuccessListener
-import com.google.firebase.firestore.DocumentReference
-import com.google.firebase.firestore.FirebaseFirestoreException
-import io.mockk.verify
-
-import com.google.firebase.firestore.CollectionReference
-import com.google.firebase.firestore.DocumentSnapshot
-import com.google.firebase.firestore.EventListener
-import com.google.firebase.firestore.FirebaseFirestore
-import com.google.firebase.firestore.QuerySnapshot
 import org.junit.Assert.*
 
 import ru.gressor.autoficus.data.entity.Note
@@ -35,7 +23,7 @@ class FireDbDataProviderTest {
     @get:Rule
     val taskExecutorRule = InstantTaskExecutorRule()
 
-    private val mockDb = mockk<FirebaseFirestore>()
+    private val mockDb = mockk<FirebaseFirestore>() // relaxed = true ?
     private val mockAuth = mockk<FirebaseAuth>()
     private val mockResultCollection = mockk<CollectionReference>()
     private val mockUser = mockk<FirebaseUser>()
@@ -88,5 +76,63 @@ class FireDbDataProviderTest {
         slot.captured.onEvent(mockSnapshot, null)
 
         assertEquals(testNotes, result)
+    }
+
+    @Test
+    fun `subscribeToAllNotes returns error`() {
+        var result: Throwable? = null
+        val mockException = mockk<FirebaseFirestoreException>()
+        val slot = slot<EventListener<QuerySnapshot>>()
+        every { mockResultCollection.addSnapshotListener(capture(slot)) } returns mockk()
+
+        provider.subscribeToAllNotes().observeForever {
+            result = (it as? RequestResult.Error)?.error
+        }
+        slot.captured.onEvent(null, mockException)
+
+        assertEquals(result, mockException)
+    }
+
+    @Test
+    fun `saveNote calls set once`() {
+        val mockDocumentReference = mockk<DocumentReference>()
+        every { mockResultCollection.document(testNotes[0].id) } returns mockDocumentReference
+
+        provider.saveNote(testNotes[0])
+
+        verify(exactly = 1) { mockDocumentReference.set(testNotes[0]) }
+    }
+
+    @Test
+    fun `saveNote returns Note`() {
+        var result: Note? = null
+        val mockDocumentReference = mockk<DocumentReference>()
+        val slot = slot<OnSuccessListener<in Void>>()
+        every { mockResultCollection.document(testNotes[0].id) } returns mockDocumentReference
+        every { mockDocumentReference.set(testNotes[0]).addOnSuccessListener(capture(slot)) } returns mockk()
+
+        provider.saveNote(testNotes[0]).observeForever {
+            @Suppress("UNCHECKED_CAST")
+            result = (it as? RequestResult.Success<Note>)?.data
+        }
+
+        slot.captured.onSuccess(null)
+        assertEquals(result, testNotes[0])
+    }
+
+    @Test
+    fun `deleteNote returns Success`() {
+        var result: RequestResult? = null
+        val mockDocumentReference = mockk<DocumentReference>()
+        val slot = slot<OnSuccessListener<in Void>>()
+        every { mockResultCollection.document(testNotes[0].id) } returns mockDocumentReference
+        every { mockDocumentReference.delete().addOnSuccessListener(capture(slot)) } returns mockk()
+
+        provider.deleteNote(testNotes[0].id).observeForever {
+            result = (it as? RequestResult.Success<*>)
+        }
+
+        slot.captured.onSuccess(null)
+        assertEquals(result, RequestResult.Success(null))
     }
 }

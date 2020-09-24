@@ -35,7 +35,7 @@ class FireDbDataProvider(
                     .addSnapshotListener { querySnapshot, error ->
                         this.value = error?.let {
                             Log.d(DEBUG_TAG, "Error in subscribeToAllNotes: ${it.message}")
-                            throw it
+                            return@let RequestResult.Error(it)
                         } ?: querySnapshot?.let {
                             Log.d(DEBUG_TAG, "subscribeToAllNotes")
                             val notes = it.documents.map { documentSnapshot ->
@@ -60,7 +60,7 @@ class FireDbDataProvider(
                     }
                     .addOnFailureListener { error ->
                         Log.d(DEBUG_TAG, "Error in getNoteById: ${error.message}")
-                        throw error
+                        this.value = RequestResult.Error(error)
                     }
             } catch (error: Throwable) {
                 this.value = RequestResult.Error(error)
@@ -78,7 +78,7 @@ class FireDbDataProvider(
                     }
                     .addOnFailureListener { error ->
                         Log.d(DEBUG_TAG, "Error in deleteNote: ${error.message}")
-                        throw error
+                        this.value = RequestResult.Error(error)
                     }
             } catch (error: Throwable) {
                 this.value = RequestResult.Error(error)
@@ -94,7 +94,7 @@ class FireDbDataProvider(
                     }
                     .addOnFailureListener { error ->
                         Log.d(DEBUG_TAG, "Error in saveNote: ${error.message}")
-                        throw error
+                        this.value = RequestResult.Error(error)
                     }
             } catch (error: Throwable) {
                 this.value = RequestResult.Error(error)
