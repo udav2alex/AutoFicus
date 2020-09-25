@@ -26,8 +26,8 @@ class FireDbDataProvider(
     private val currentUser
         get() = auth.currentUser
 
-    private val userNotesCollection =
-        currentUser?.let {
+    private val userNotesCollection
+        get() = currentUser?.let {
             db.collection(USERS_COLLECTION).document(it.uid).collection(NOTES_COLLECTION)
         } ?: throw NoAuthException()
 
