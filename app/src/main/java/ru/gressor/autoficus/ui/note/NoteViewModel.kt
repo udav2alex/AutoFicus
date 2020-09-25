@@ -42,8 +42,8 @@ class NoteViewModel(private val notesRepository: NotesRepository) :
         launch {
             pendingNote?.let {
                 notesRepository.saveNote(it)
+                super.onCleared()
             }
         }
-        super.onCleared()
     }
 }

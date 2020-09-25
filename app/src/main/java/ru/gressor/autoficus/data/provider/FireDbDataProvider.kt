@@ -108,7 +108,7 @@ class FireDbDataProvider(
             try {
                 currentUser?.let {
                     continuation.resume(User(it.displayName ?: "", it.email ?: ""))
-                }
+                } ?: continuation.resume(null)
             } catch (e: Throwable) {
                 continuation.resumeWithException(e)
             }

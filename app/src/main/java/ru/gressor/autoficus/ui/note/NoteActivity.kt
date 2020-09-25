@@ -27,7 +27,7 @@ class NoteActivity : BaseActivity<NoteData>() {
     override val viewModel: NoteViewModel by viewModel()
 
     private var note: Note? = null
-    private var color: Color = Color.BLUE
+    private var pickedColor: Color? = null
 
     companion object {
         private val EXTRA_NOTE = NoteActivity::class.java.name + "extra.NOTE"
@@ -60,15 +60,18 @@ class NoteActivity : BaseActivity<NoteData>() {
         if (note_title.text == null || note_title.text!!.length < 3) return
 
         launch {
+            val newColor = pickedColor ?: note?.color ?: Color.WHITE
+
             note = note?.copy(
                 title = note_title.text.toString(),
                 text = note_text.text.toString(),
                 lastChanged = Date(),
-                color = color
+                color = newColor
             ) ?: Note(
                 UUID.randomUUID().toString(),
                 note_title.text.toString(),
-                note_text.text.toString()
+                note_text.text.toString(),
+                newColor
             )
 
             note?.let {
@@ -96,8 +99,8 @@ class NoteActivity : BaseActivity<NoteData>() {
         note_text.addTextChangedListener(textChangeListener)
 
         colorPicker.onColorClickListener = {
-            color = it
-            toolbar.setBackgroundColor(color.getColorInt(this@NoteActivity))
+            pickedColor = it
+            toolbar.setBackgroundColor(it.getColorInt(this@NoteActivity))
             saveNote()
         }
     }
