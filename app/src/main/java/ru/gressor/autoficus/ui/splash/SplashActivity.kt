@@ -1,10 +1,12 @@
 package ru.gressor.autoficus.ui.splash
 
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import org.koin.android.viewmodel.ext.android.viewModel
 import ru.gressor.autoficus.ui.base.BaseActivity
 import ru.gressor.autoficus.ui.main.MainActivity
 
-class SplashActivity: BaseActivity<Boolean?, SplashViewState>() {
+@ExperimentalCoroutinesApi
+class SplashActivity: BaseActivity<Boolean?>() {
 
     override val viewModel: SplashViewModel by viewModel()
     override val layoutRes: Int? = null
@@ -20,7 +22,7 @@ class SplashActivity: BaseActivity<Boolean?, SplashViewState>() {
         }
     }
 
-    private fun startMainActivity(){
+    private fun startMainActivity() {
         MainActivity.start(this)
         finish()
     }

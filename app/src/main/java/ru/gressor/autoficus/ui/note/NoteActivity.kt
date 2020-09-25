@@ -9,6 +9,8 @@ import android.text.TextWatcher
 import android.view.Menu
 import android.view.MenuItem
 import kotlinx.android.synthetic.main.activity_note.*
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.launch
 import org.koin.android.viewmodel.ext.android.viewModel
 import ru.gressor.autoficus.R
 import ru.gressor.autoficus.data.entity.Color
@@ -18,7 +20,8 @@ import ru.gressor.autoficus.ui.common.format
 import ru.gressor.autoficus.ui.common.getColorInt
 import java.util.*
 
-class NoteActivity : BaseActivity<NoteViewState.Data, NoteViewState>() {
+@ExperimentalCoroutinesApi
+class NoteActivity : BaseActivity<NoteData>() {
 
     override val layoutRes = R.layout.activity_note
     override val viewModel: NoteViewModel by viewModel()
@@ -56,19 +59,21 @@ class NoteActivity : BaseActivity<NoteViewState.Data, NoteViewState>() {
     private fun saveNote() {
         if (note_title.text == null || note_title.text!!.length < 3) return
 
-        note = note?.copy(
-            title = note_title.text.toString(),
-            text = note_text.text.toString(),
-            lastChanged = Date(),
-            color = color
-        ) ?: Note(
-            UUID.randomUUID().toString(),
-            note_title.text.toString(),
-            note_text.text.toString()
-        )
+        launch {
+            note = note?.copy(
+                title = note_title.text.toString(),
+                text = note_text.text.toString(),
+                lastChanged = Date(),
+                color = color
+            ) ?: Note(
+                UUID.randomUUID().toString(),
+                note_title.text.toString(),
+                note_text.text.toString()
+            )
 
-        note?.let {
-            viewModel.saveChanges(it)
+            note?.let {
+                viewModel.saveChanges(it)
+            }
         }
     }
 
@@ -97,7 +102,7 @@ class NoteActivity : BaseActivity<NoteViewState.Data, NoteViewState>() {
         }
     }
 
-    override fun renderData(data: NoteViewState.Data) {
+    override fun renderData(data: NoteData) {
         if(data.isDeleted) finish()
         this.note = data.note
         initView()

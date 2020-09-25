@@ -9,6 +9,7 @@ import android.view.MenuItem
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.firebase.ui.auth.AuthUI
 import kotlinx.android.synthetic.main.activity_main.*
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import org.koin.android.viewmodel.ext.android.viewModel
 import ru.gressor.autoficus.R
 import ru.gressor.autoficus.data.entity.Note
@@ -16,7 +17,8 @@ import ru.gressor.autoficus.ui.base.BaseActivity
 import ru.gressor.autoficus.ui.note.NoteActivity
 import ru.gressor.autoficus.ui.splash.SplashActivity
 
-class MainActivity : BaseActivity<List<Note>?, MainViewState>() {
+@ExperimentalCoroutinesApi
+class MainActivity : BaseActivity<List<Note>?>() {
 
     companion object {
         fun start(context: Context) {
