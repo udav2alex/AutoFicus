@@ -13,7 +13,8 @@ import ru.gressor.autoficus.ui.common.DEBUG_TAG
 
 class FireDbDataProvider(
     private val db: FirebaseFirestore,
-    private val auth: FirebaseAuth) : RemoteDataProvider {
+    private val auth: FirebaseAuth
+) : RemoteDataProvider {
 
     companion object {
         private const val NOTES_COLLECTION = "notes"
@@ -23,10 +24,10 @@ class FireDbDataProvider(
     private val currentUser
         get() = auth.currentUser
 
-    private val userNotesCollection =
-        currentUser?.let {
-            db.collection(USERS_COLLECTION).document(it.uid).collection(NOTES_COLLECTION)
-        } ?: throw NoAuthException()
+    private val userNotesCollection
+        get() = currentUser?.let {
+                db.collection(USERS_COLLECTION).document(it.uid).collection(NOTES_COLLECTION)
+            } ?: throw NoAuthException()
 
     override fun subscribeToAllNotes(): LiveData<RequestResult> =
         MutableLiveData<RequestResult>().apply {
@@ -34,10 +35,8 @@ class FireDbDataProvider(
                 userNotesCollection
                     .addSnapshotListener { querySnapshot, error ->
                         this.value = error?.let {
-                            Log.d(DEBUG_TAG, "Error in subscribeToAllNotes: ${it.message}")
                             return@let RequestResult.Error(it)
                         } ?: querySnapshot?.let {
-                            Log.d(DEBUG_TAG, "subscribeToAllNotes")
                             val notes = it.documents.map { documentSnapshot ->
                                 documentSnapshot.toObject(Note::class.java)
                             }
@@ -54,12 +53,10 @@ class FireDbDataProvider(
             try {
                 userNotesCollection.document(id).get()
                     .addOnSuccessListener { snapshot ->
-                        Log.d(DEBUG_TAG, "getNoteById")
                         val note = snapshot.toObject(Note::class.java) as Note
                         this.value = RequestResult.Success(note)
                     }
                     .addOnFailureListener { error ->
-                        Log.d(DEBUG_TAG, "Error in getNoteById: ${error.message}")
                         this.value = RequestResult.Error(error)
                     }
             } catch (error: Throwable) {
@@ -70,14 +67,11 @@ class FireDbDataProvider(
     override fun deleteNote(id: String): LiveData<RequestResult> =
         MutableLiveData<RequestResult>().apply {
             try {
-                Log.d(DEBUG_TAG, "deleteNote begin")
                 userNotesCollection.document(id).delete()
                     .addOnSuccessListener {
-                        Log.d(DEBUG_TAG, "deleteNote")
                         this.value = RequestResult.Success(null)
                     }
                     .addOnFailureListener { error ->
-                        Log.d(DEBUG_TAG, "Error in deleteNote: ${error.message}")
                         this.value = RequestResult.Error(error)
                     }
             } catch (error: Throwable) {
@@ -93,7 +87,6 @@ class FireDbDataProvider(
                         this.value = RequestResult.Success(note)
                     }
                     .addOnFailureListener { error ->
-                        Log.d(DEBUG_TAG, "Error in saveNote: ${error.message}")
                         this.value = RequestResult.Error(error)
                     }
             } catch (error: Throwable) {
