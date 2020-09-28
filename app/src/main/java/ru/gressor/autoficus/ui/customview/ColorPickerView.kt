@@ -58,33 +58,12 @@ class ColorPickerView @JvmOverloads constructor(
         }
     }
 
-//    constructor(context: Context) : this(context, null, 0)
-//    constructor(context: Context, attrs: AttributeSet?) : this(context, attrs, 0)
-//    constructor(context: Context, attrs: AttributeSet?, defStyleAttr: Int) : super(context, attrs, defStyleAttr) {
-//        orientation = HORIZONTAL
-//        gravity = Gravity.CENTER
-//
-//        Note.Color.values().forEach { color ->
-//            addView(
-//                ColorCircleView(context).apply {
-//                    fillColorRes = color.getColorRes()
-//                    tag = color
-//                    dip(COLOR_VIEW_PADDING).let {
-//                        setPadding(it, it, it, it)
-//                    }
-//                    setOnClickListener { onColorClickListener(it.tag as Note.Color) }
-//                })
-//        }
-//
-//    }
-
     init {
         orientation = HORIZONTAL
         gravity = Gravity.CENTER
         Color.values().forEach { color ->
             addView(
                 ColorCircleView(context).apply {
-                    val thisColor = color.getColorRes()
                     fillColorRes = color.getColorRes()
                     tag = color
                     dp2Px(COLOR_VIEW_PADDING).let {px ->

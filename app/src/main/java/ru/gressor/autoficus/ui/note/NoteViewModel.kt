@@ -1,54 +1,49 @@
 package ru.gressor.autoficus.ui.note
 
-import android.util.Log
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.launch
 import ru.gressor.autoficus.data.NotesRepository
 import ru.gressor.autoficus.data.entity.Note
-import ru.gressor.autoficus.data.model.RequestResult.*
 import ru.gressor.autoficus.ui.base.BaseViewModel
-import ru.gressor.autoficus.ui.common.DEBUG_TAG
 
+@ExperimentalCoroutinesApi
 class NoteViewModel(private val notesRepository: NotesRepository) :
-    BaseViewModel<NoteViewState.Data, NoteViewState>() {
+    BaseViewModel<NoteData>() {
 
     private val pendingNote: Note?
-        get() = viewStateLiveData.value?.data?.note
+        get() = getViewStateChannel().poll()?.note
+
+    fun saveChanges(note: Note) {
+        setData(NoteData(note = note))
+    }
 
     fun loadNote(noteId: String) {
-        notesRepository.getNoteById(noteId).observeForever {
-            it?.let { result ->
-                when (result) {
-                    is Success<*> -> viewStateLiveData.value =
-                        NoteViewState(NoteViewState.Data(note = result.data as? Note))
-                    is Error -> viewStateLiveData.value =
-                        NoteViewState(error = result.error)
-                }
+        launch {
+            try {
+                setData(NoteData(note = notesRepository.getNoteById(noteId)))
+            } catch (e: Throwable) {
+                setError(e)
             }
         }
     }
 
     fun deleteNote() {
-        pendingNote?.let {
-            Log.d(DEBUG_TAG, "RequestResult???")
-            notesRepository.deleteNote(it.id).observeForever { requestResult ->
-                Log.d(DEBUG_TAG, "RequestResult")
-                requestResult ?: return@observeForever
-                when (requestResult) {
-                    is Success<*> -> viewStateLiveData.value =
-                        NoteViewState(NoteViewState.Data(isDeleted = true))
-                    is Error -> viewStateLiveData.value =
-                        NoteViewState(error = requestResult.error)
-                }
+        launch {
+            try {
+                pendingNote?.let { notesRepository.deleteNote(it.id) }
+                setData(NoteData(isDeleted = true))
+            } catch (e: Throwable) {
+                setError(e)
             }
         }
     }
 
-    fun saveChanges(note: Note) {
-        viewStateLiveData.value = NoteViewState(NoteViewState.Data(note = note))
-    }
-
     override fun onCleared() {
-        pendingNote?.let {
-            notesRepository.saveNote(it)
+        launch {
+            pendingNote?.let {
+                notesRepository.saveNote(it)
+                super.onCleared()
+            }
         }
     }
 }

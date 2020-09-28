@@ -2,6 +2,7 @@ package ru.gressor.autoficus.di
 
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import org.koin.android.viewmodel.ext.koin.viewModel
 import org.koin.dsl.module.module
 import ru.gressor.autoficus.data.NotesRepository
@@ -18,14 +19,17 @@ val appModule = module {
     single { NotesRepository(get()) }
 }
 
+@ExperimentalCoroutinesApi
 val splashModule = module {
     viewModel { SplashViewModel(get()) }
 }
 
+@ExperimentalCoroutinesApi
 val mainModule = module {
     viewModel { MainViewModel(get()) }
 }
 
+@ExperimentalCoroutinesApi
 val noteModule = module {
     viewModel { NoteViewModel(get()) }
 }
