@@ -84,7 +84,6 @@ class ColorPickerView @JvmOverloads constructor(
         Color.values().forEach { color ->
             addView(
                 ColorCircleView(context).apply {
-                    val thisColor = color.getColorRes()
                     fillColorRes = color.getColorRes()
                     tag = color
                     dp2Px(COLOR_VIEW_PADDING).let {px ->
